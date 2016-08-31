@@ -26,3 +26,45 @@ unsigned GetFileLineCount(const char *pFilename){
 	fclose(inputFile);
 	return totalLines;
 }
+
+PressureInfo *LoadSensorDataFromFile(const char *pFilename, const unsigned infoCount){
+	if (!(pFilename) || (strlen(pFilename) == 0) || !(infoCount > 1)){
+		return NULL;
+	}
+
+	// open file for reading, verify the open succeeded
+	FILE* inputFile = fopen(pFilename, "r");
+	if (!inputFile){
+		return NULL;
+	}
+
+	// allocate a block of memory large enough for the number of PressureInfo structures specified by infoCount
+	// verify malloc succeeded
+	PressureInfo* pressureInput = NULL;
+	pressureInput = (PressureInfo *) malloc(sizeof(PressureInfo)*infoCount);
+	if (!pressureInput){
+		return NULL;
+	}
+
+	unsigned int i = 0;				// used for iteration
+	int scanResult = 0;				// used to verify sscanf succeeded
+	for (i = 0;i<=infoCount; i++){
+		scanResult = fscanf(inputFile, "%lf", &pressureInput[i].sensorPressure);
+		if (scanResult != 1){
+			free(pressureInput);
+			fclose(inputFile);
+			return NULL;
+		}
+		pressureInput[i].filteredPressure = 0.0;
+		pressureInput[i].forecast = NULL;
+		if ((pressureInput[i].sensorPressure >= LOWEST_PRESSURE_RECORD) && (pressureInput[i].sensorPressure <= HIGHEST_PRESSURE_RECORD)){
+			pressureInput[i].isValid = true;
+		}
+		else{
+			pressureInput[i].isValid = false;
+		}
+	}
+
+	fclose(inputFile);
+	return pressureInput;
+}
