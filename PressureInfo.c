@@ -71,10 +71,10 @@ PressureInfo *LoadSensorDataFromFile(const char *pFilename, const unsigned infoC
 
 void ApplyLowpassFilter(PressureInfo *pressureInfo, const unsigned infoCount, const double beta){
 
-	// CONTINUE HERE!
 	int i = 0;					// used for iteration through the array
 	bool isFirstValid = true;	// flag used to identify the first valid array of a sequence
 
+	/*	FOR loop to iterate through the array of PressureInfo structures	*/
 	for (i = 0; i < infoCount; i++){
 		if ((pressureInfo[i].isValid) && (isFirstValid)){
 			// first low pass filter formula:
@@ -87,6 +87,41 @@ void ApplyLowpassFilter(PressureInfo *pressureInfo, const unsigned infoCount, co
 		}
 		else{
 			isFirstValid = true;	// reset flag to 'true' 
+		}
+	}
+}
+
+void AnalyzeFilteredData(PressureInfo *pressureInfo, const unsigned infoCount){
+	int i = 0;
+	bool isFirstValid = true;	// flag used to identify the first valid array of a sequence
+	
+	/*	FOR loop to iterate through array of PressureInfo structures	*/
+	for (i = 0; i < infoCount; i++){
+		if ((pressureInfo[i].isValid)&&(isFirstValid)){
+			pressureInfo[i].forecast = "--- Restart ---";
+			isFirstValid = false;	// found the first valid array in sequence, set the flag to false
+		}
+		else if ((pressureInfo[i].isValid) && (pressureInfo[i].filteredPressure > UPPER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure >= pressureInfo[i - 1].filteredPressure)){
+			pressureInfo[i].forecast = "Fair";
+		}
+		else if ((pressureInfo[i].isValid) && (pressureInfo[i].filteredPressure > UPPER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure < pressureInfo[i - 1].filteredPressure)){
+			pressureInfo[i].forecast = "Cloudy";
+		}
+		else if ((pressureInfo[i].isValid) && (pressureInfo[i].filteredPressure < LOWER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure >= pressureInfo[i - 1].filteredPressure)){
+			pressureInfo[i].forecast = "Clearing";
+		}
+		else if ((pressureInfo[i].isValid) && (pressureInfo[i].filteredPressure < LOWER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure < pressureInfo[i - 1].filteredPressure)){
+			pressureInfo[i].forecast = "Precipitation or Storm";
+		}
+		else if ((pressureInfo[i].isValid) && (LOWER_PRESSURE_THRESHOLD < pressureInfo[i].filteredPressure < UPPER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure > pressureInfo[i - 1].filteredPressure)){
+			pressureInfo[i].forecast = "No Change";
+		}
+		else if ((pressureInfo[i].isValid) && (LOWER_PRESSURE_THRESHOLD < pressureInfo[i].filteredPressure < UPPER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure < pressureInfo[i - 1].filteredPressure)){
+			pressureInfo[i].forecast = "Precipitation Likely";
+		}
+		else {
+			// else statement for pressureInfo is not valid
+			isFirstValid = true;	// reset the flag to deteremine the first valid array in sequence.
 		}
 	}
 }
