@@ -68,3 +68,25 @@ PressureInfo *LoadSensorDataFromFile(const char *pFilename, const unsigned infoC
 	fclose(inputFile);
 	return pressureInput;
 }
+
+void ApplyLowpassFilter(PressureInfo *pressureInfo, const unsigned infoCount, const double beta){
+
+	// CONTINUE HERE!
+	int i = 0;					// used for iteration through the array
+	bool isFirstValid = true;	// flag used to identify the first valid array of a sequence
+
+	for (i = 0; i < infoCount; i++){
+		if ((pressureInfo[i].isValid) && (isFirstValid)){
+			// first low pass filter formula:
+			pressureInfo[i].filteredPressure = pressureInfo[i].sensorPressure;
+			isFirstValid = false;	// found the first valid in sequence, set flag to false
+		}
+		else if ((pressureInfo[i].isValid) && (!isFirstValid)){
+			// second low pass filter formula:
+			pressureInfo[i].filteredPressure = (beta * pressureInfo[i].sensorPressure) + (double)(1.00 - beta) * pressureInfo[i].filteredPressure;
+		}
+		else{
+			isFirstValid = true;	// reset flag to 'true' 
+		}
+	}
+}
