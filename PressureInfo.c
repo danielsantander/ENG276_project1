@@ -1,10 +1,16 @@
+// A01151866
+// 13256
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "PressureInfo.h"
 
+
+/*	Recieves a pointer to a string containing the input file name, and returns the total number
+	of lines present in the text file.	*/
 unsigned GetFileLineCount(const char *pFilename){
+
 	// checks if the file is not NULL and string length is greater than 0
 	if ( !(pFilename) || !(strlen(pFilename) > 0) ){
 		return 0;
@@ -23,12 +29,17 @@ unsigned GetFileLineCount(const char *pFilename){
 		}
 	}
 
-	fclose(inputFile);
-	return totalLines;
+	fclose(inputFile);		// always close file when done
+	return totalLines;		// return the total number of lines present in the text file
 }
 
+
+/*	Receives a pointer to a string containing the input file name and the number of lines contained in the file,
+	and returns ointer to a dynamically-allocated array of PressureInfo structures.	*/
 PressureInfo *LoadSensorDataFromFile(const char *pFilename, const unsigned infoCount){
-	if (!(pFilename) || (strlen(pFilename) == 0) || !(infoCount > 1)){
+	
+	//	checks if pointer to file is not NULL, length of string is nonzero, and infoCount is >1
+	if ((!pFilename) || (strlen(pFilename) == 0) || !(infoCount > 1)){
 		return NULL;
 	}
 
@@ -38,8 +49,8 @@ PressureInfo *LoadSensorDataFromFile(const char *pFilename, const unsigned infoC
 		return NULL;
 	}
 
-	// allocate a block of memory large enough for the number of PressureInfo structures specified by infoCount
-	// verify malloc succeeded
+	/*	allocate a block of memory large enough for the number of PressureInfo structures specified by infoCount
+		then verify malloc succeeded	*/
 	PressureInfo* pressureInput = NULL;
 	pressureInput = (PressureInfo *) malloc(sizeof(PressureInfo)*infoCount);
 	if (!pressureInput){
@@ -55,6 +66,7 @@ PressureInfo *LoadSensorDataFromFile(const char *pFilename, const unsigned infoC
 			fclose(inputFile);
 			return NULL;
 		}
+		// initializing the reset of the structure:
 		pressureInput[i].filteredPressure = 0.0;
 		pressureInput[i].forecast = NULL;
 		if ((pressureInput[i].sensorPressure >= LOWEST_PRESSURE_RECORD) && (pressureInput[i].sensorPressure <= HIGHEST_PRESSURE_RECORD)){
@@ -65,10 +77,14 @@ PressureInfo *LoadSensorDataFromFile(const char *pFilename, const unsigned infoC
 		}
 	}
 
-	fclose(inputFile);
-	return pressureInput;
+	fclose(inputFile);		// always close file when finished
+	return pressureInput;	// return pointer to the allocated array to the caller
 }
 
+
+/*	Receives a pointer to an array of PressureInfo structures, the number of elements in the array, 
+	and the beta value that will be plugged into the lowpass filter formula. This function performs
+	its calculations and stores the result into the filteredPressure member of each element in the array */
 void ApplyLowpassFilter(PressureInfo *pressureInfo, const unsigned infoCount, const double beta){
 
 	int i = 0;					// used for iteration through the array
@@ -77,12 +93,14 @@ void ApplyLowpassFilter(PressureInfo *pressureInfo, const unsigned infoCount, co
 	/*	FOR loop to iterate through the array of PressureInfo structures	*/
 	for (i = 0; i < infoCount; i++){
 		if ((pressureInfo[i].isValid) && (isFirstValid)){
-			// first low pass filter formula:
+			
+			/* first low pass filter formula:	y_0 = x_0	*/
 			pressureInfo[i].filteredPressure = pressureInfo[i].sensorPressure;
 			isFirstValid = false;	// found the first valid in sequence, set flag to false
 		}
 		else if ((pressureInfo[i].isValid) && (!isFirstValid)){
-			// second low pass filter formula:
+
+			/* second low pass filter formula:	y_i = Beta * x_i + (1-Beta)y_i-1 , where 0 < Beta < 1	*/
 			pressureInfo[i].filteredPressure = (beta * pressureInfo[i].sensorPressure) + (double)(1.00 - beta) * pressureInfo[i].filteredPressure;
 		}
 		else{
@@ -91,6 +109,10 @@ void ApplyLowpassFilter(PressureInfo *pressureInfo, const unsigned infoCount, co
 	}
 }
 
+
+/*	Receives a pointer to an array of PressureInfo structures, and the number of elements in the array.
+	The function performs its analysis of each VALID filteredPressure member and stores its weather
+	prediction into the forcast member*/	
 void AnalyzeFilteredData(PressureInfo *pressureInfo, const unsigned infoCount){
 	int i = 0;
 	bool isFirstValid = true;	// flag used to identify the first valid array of a sequence
@@ -111,7 +133,7 @@ void AnalyzeFilteredData(PressureInfo *pressureInfo, const unsigned infoCount){
 			pressureInfo[i].forecast = "Clearing";
 		}
 		else if ((pressureInfo[i].isValid) && (pressureInfo[i].filteredPressure < LOWER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure < pressureInfo[i - 1].filteredPressure)){
-			pressureInfo[i].forecast = "Precipitation or Storm";
+			pressureInfo[i].forecast = "Preciiptation or Storm";
 		}
 		else if ((pressureInfo[i].isValid) && (LOWER_PRESSURE_THRESHOLD < pressureInfo[i].filteredPressure < UPPER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure > pressureInfo[i - 1].filteredPressure)){
 			pressureInfo[i].forecast = "No Change";
@@ -124,4 +146,27 @@ void AnalyzeFilteredData(PressureInfo *pressureInfo, const unsigned infoCount){
 			isFirstValid = true;	// reset the flag to deteremine the first valid array in sequence.
 		}
 	}
+}
+
+
+/*	Receives a pointer to an array of PressureInfo structures, the number of elements in the array, and 
+	a pointer to a string containing the output file name. This function returs a bool that is true on success,
+	false on failure	*/	
+bool SavePressureReportToFile(const PressureInfo *pressureInfo, const unsigned infoCount, const char *pFilename){
+	/*	Check conditions of the function perameters	*/
+	if ((!pressureInfo) || (!pFilename) || (strlen(pFilename) == 0) || (infoCount <= 1)){
+		return false;
+	}
+
+	/*	Open file for writing, verify fopen succeeded	*/
+	FILE* inputFile = fopen(pFilename, "w");
+	if (!inputFile){
+		return false;
+	}
+
+	/*	print the column heading to the output file	*/
+	fprintf(inputFile, "Record    Sensor Pressure     Filtered Pressure     Forecast");
+
+
+
 }
