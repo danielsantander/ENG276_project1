@@ -98,10 +98,10 @@ void ApplyLowpassFilter(PressureInfo *pressureInfo, const unsigned infoCount, co
 			pressureInfo[i].filteredPressure = pressureInfo[i].sensorPressure;
 			isFirstValid = false;	// found the first valid in sequence, set flag to false
 		}
-		else if ((pressureInfo[i].isValid) && (!isFirstValid)){
+		else if (pressureInfo[i].isValid){
 
 			/* second low pass filter formula:	y_i = Beta * x_i + (1-Beta)y_i-1 , where 0 < Beta < 1	*/
-			pressureInfo[i].filteredPressure = (beta * pressureInfo[i].sensorPressure) + (double)(1.00 - beta) * pressureInfo[i].filteredPressure;
+			pressureInfo[i].filteredPressure = (beta * pressureInfo[i].sensorPressure) + (double)(1.00 - beta) * pressureInfo[i-1].filteredPressure;
 		}
 		else{
 			isFirstValid = true;	// reset flag to 'true' 
@@ -114,7 +114,7 @@ void ApplyLowpassFilter(PressureInfo *pressureInfo, const unsigned infoCount, co
 	The function performs its analysis of each VALID filteredPressure member and stores its weather
 	prediction into the forcast member*/	
 void AnalyzeFilteredData(PressureInfo *pressureInfo, const unsigned infoCount){
-	int i = 0;
+	int i = 0;					// used for iteration
 	bool isFirstValid = true;	// flag used to identify the first valid array of a sequence
 	
 	/*	FOR loop to iterate through array of PressureInfo structures	*/
@@ -167,6 +167,16 @@ bool SavePressureReportToFile(const PressureInfo *pressureInfo, const unsigned i
 	/*	print the column heading to the output file	*/
 	fprintf(inputFile, "Record    Sensor Pressure     Filtered Pressure     Forecast");
 
+	/*	For loop that runs through all elements, check if element is valid.
+		If valid, print appropriate data into the output file	*/
+	int i = 0;
+	for (i = 0; i < infoCount; i++){
+		if (pressureInfo[i].isValid){
+			fprintf(inputFile, "%6d %18.3lf %16.3lfinHg %-5s\n", i, pressureInfo[i].sensorPressure, pressureInfo[i].filteredPressure, pressureInfo[i].forecast);
+		}
+	}
 
-
+	fclose(inputFile);
+	inputFile = NULL;
+	return true;
 }

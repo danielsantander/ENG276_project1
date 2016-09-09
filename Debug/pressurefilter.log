@@ -1,10 +1,12 @@
-﻿Build started 8/31/16 12:30:03 AM.
+﻿Build started 9/8/16 7:31:45 PM.
      1>Project "\\Mac\Home\Desktop\ENG276IN\VisualStudio\Project1\pressurefilter\pressurefilter.vcxproj" on node 2 (ClCompile target(s)).
      1>ClCompile:
-         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TC /analyze- /errorReport:prompt PressureInfo.c
-         PressureInfo.c
+         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W4 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TC /analyze- /errorReport:prompt main.c
+         main.c
+     1>\\mac\home\desktop\eng276in\visualstudio\project1\pressurefilter\main.c(24): warning C4550: expression evaluates to a function which is missing an argument list
+     1>\\mac\home\desktop\eng276in\visualstudio\project1\pressurefilter\main.c(32): warning C4550: expression evaluates to a function which is missing an argument list
      1>Done Building Project "\\Mac\Home\Desktop\ENG276IN\VisualStudio\Project1\pressurefilter\pressurefilter.vcxproj" (ClCompile target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.26
+Time Elapsed 00:00:00.78
