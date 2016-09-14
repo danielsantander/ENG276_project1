@@ -1,12 +1,16 @@
-﻿Build started 9/8/16 7:31:45 PM.
-     1>Project "\\Mac\Home\Desktop\ENG276IN\VisualStudio\Project1\pressurefilter\pressurefilter.vcxproj" on node 2 (ClCompile target(s)).
+﻿Build started 9/13/16 6:32:03 PM.
+     1>Project "\\Mac\Home\Desktop\ENG276IN\VisualStudio\Project1\pressurefilter\pressurefilter.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W4 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TC /analyze- /errorReport:prompt main.c
+         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W4 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TC /analyze- /errorReport:prompt PressureInfo.c main.c
          main.c
-     1>\\mac\home\desktop\eng276in\visualstudio\project1\pressurefilter\main.c(24): warning C4550: expression evaluates to a function which is missing an argument list
-     1>\\mac\home\desktop\eng276in\visualstudio\project1\pressurefilter\main.c(32): warning C4550: expression evaluates to a function which is missing an argument list
-     1>Done Building Project "\\Mac\Home\Desktop\ENG276IN\VisualStudio\Project1\pressurefilter\pressurefilter.vcxproj" (ClCompile target(s)).
+         PressureInfo.c
+         Generating Code...
+       Link:
+         C:\Program Files\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"\\Mac\Home\Desktop\ENG276IN\VisualStudio\Project1\pressurefilter\Debug\pressurefilter.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"\\Mac\Home\Desktop\ENG276IN\VisualStudio\Project1\pressurefilter\Debug\pressurefilter.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"\\Mac\Home\Desktop\ENG276IN\VisualStudio\Project1\pressurefilter\Debug\pressurefilter.lib" /MACHINE:X86 Debug\main.obj
+         Debug\PressureInfo.obj
+         pressurefilter.vcxproj -> \\Mac\Home\Desktop\ENG276IN\VisualStudio\Project1\pressurefilter\Debug\pressurefilter.exe
+     1>Done Building Project "\\Mac\Home\Desktop\ENG276IN\VisualStudio\Project1\pressurefilter\pressurefilter.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.78
+Time Elapsed 00:00:01.46

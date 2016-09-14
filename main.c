@@ -1,5 +1,6 @@
 // A01151866
 // 13256
+// This main source file performs a low pass filter algorithm given an input of pressure vaules (of type double)
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +22,7 @@ int main(int argc, char *argv[]){
 	/* If incorrect num of arguments, show usage statement. */
 	if (argc != 4){
 		printf("Incorrect number of comand-line arguments.\n");
-		ShowUsageAndExit;
+		ShowUsageAndExit();
 	}
 
 	/* Uses sscanf to convert argv[2] into  a double. If beta is NOT between
@@ -29,7 +30,7 @@ int main(int argc, char *argv[]){
 	double betaValue = 0.0;
 	if ( (sscanf(argv[2],"%lf", &betaValue) != 1) || (betaValue < 0) || (betaValue > 1)){
 		printf("Error: beta value must be greater than 0 and less than 1.\n");
-		ShowUsageAndExit;
+		ShowUsageAndExit();
 	}
 
 	/*	Call GetFileLineCount to fine the number of lines in the input file.	*/

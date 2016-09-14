@@ -1,5 +1,6 @@
 // A01151866
 // 13256
+// This source file defines the functions which will be used in the main source file and which were declared in the header file.
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <string.h>
@@ -16,8 +17,8 @@ unsigned GetFileLineCount(const char *pFilename){
 		return 0;
 	}
 
-	FILE* inputFile = fopen(pFilename, "r");	// opens file for READING
-	if (!inputFile){
+	FILE *inputFile = fopen(pFilename, "r");	// opens file for READING
+	if (inputFile == NULL){
 		return 0;
 	}
 
@@ -39,27 +40,27 @@ unsigned GetFileLineCount(const char *pFilename){
 PressureInfo *LoadSensorDataFromFile(const char *pFilename, const unsigned infoCount){
 	
 	//	checks if pointer to file is not NULL, length of string is nonzero, and infoCount is >1
-	if ((!pFilename) || (strlen(pFilename) == 0) || !(infoCount > 1)){
+	if ((pFilename == NULL) || (strlen(pFilename) == 0) || !(infoCount > 1)){
 		return NULL;
 	}
 
 	// open file for reading, verify the open succeeded
 	FILE* inputFile = fopen(pFilename, "r");
-	if (!inputFile){
+	if (inputFile == NULL){
 		return NULL;
 	}
 
 	/*	allocate a block of memory large enough for the number of PressureInfo structures specified by infoCount
 		then verify malloc succeeded	*/
 	PressureInfo* pressureInput = NULL;
-	pressureInput = (PressureInfo *) malloc(sizeof(PressureInfo)*infoCount);
-	if (!pressureInput){
+	pressureInput = malloc(sizeof(PressureInfo)*infoCount);
+	if (pressureInput == NULL){
 		return NULL;
 	}
 
 	unsigned int i = 0;				// used for iteration
 	int scanResult = 0;				// used to verify sscanf succeeded
-	for (i = 0;i<=infoCount; i++){
+	for (i = 0;i<infoCount; i++){
 		scanResult = fscanf(inputFile, "%lf", &pressureInput[i].sensorPressure);
 		if (scanResult != 1){
 			free(pressureInput);
@@ -87,8 +88,8 @@ PressureInfo *LoadSensorDataFromFile(const char *pFilename, const unsigned infoC
 	its calculations and stores the result into the filteredPressure member of each element in the array */
 void ApplyLowpassFilter(PressureInfo *pressureInfo, const unsigned infoCount, const double beta){
 
-	int i = 0;					// used for iteration through the array
-	bool isFirstValid = true;	// flag used to identify the first valid array of a sequence
+	unsigned i = 0;					// used for iteration through the array
+	bool isFirstValid = true;		// flag used to identify the first valid array of a sequence
 
 	/*	FOR loop to iterate through the array of PressureInfo structures	*/
 	for (i = 0; i < infoCount; i++){
@@ -114,7 +115,7 @@ void ApplyLowpassFilter(PressureInfo *pressureInfo, const unsigned infoCount, co
 	The function performs its analysis of each VALID filteredPressure member and stores its weather
 	prediction into the forcast member*/	
 void AnalyzeFilteredData(PressureInfo *pressureInfo, const unsigned infoCount){
-	int i = 0;					// used for iteration
+	unsigned i = 0;					// used for iteration
 	bool isFirstValid = true;	// flag used to identify the first valid array of a sequence
 	
 	/*	FOR loop to iterate through array of PressureInfo structures	*/
@@ -135,7 +136,7 @@ void AnalyzeFilteredData(PressureInfo *pressureInfo, const unsigned infoCount){
 		else if ((pressureInfo[i].isValid) && (pressureInfo[i].filteredPressure < LOWER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure < pressureInfo[i - 1].filteredPressure)){
 			pressureInfo[i].forecast = "Preciiptation or Storm";
 		}
-		else if ((pressureInfo[i].isValid) && (LOWER_PRESSURE_THRESHOLD < pressureInfo[i].filteredPressure < UPPER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure > pressureInfo[i - 1].filteredPressure)){
+		else if ((pressureInfo[i].isValid) && (LOWER_PRESSURE_THRESHOLD < pressureInfo[i].filteredPressure < UPPER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure >= pressureInfo[i - 1].filteredPressure)){
 			pressureInfo[i].forecast = "No Change";
 		}
 		else if ((pressureInfo[i].isValid) && (LOWER_PRESSURE_THRESHOLD < pressureInfo[i].filteredPressure < UPPER_PRESSURE_THRESHOLD) && (pressureInfo[i].filteredPressure < pressureInfo[i - 1].filteredPressure)){
@@ -159,24 +160,24 @@ bool SavePressureReportToFile(const PressureInfo *pressureInfo, const unsigned i
 	}
 
 	/*	Open file for writing, verify fopen succeeded	*/
-	FILE* inputFile = fopen(pFilename, "w");
-	if (!inputFile){
+	FILE* outputFile = fopen(pFilename, "w");
+	if (!outputFile){
 		return false;
 	}
 
 	/*	print the column heading to the output file	*/
-	fprintf(inputFile, "Record    Sensor Pressure     Filtered Pressure     Forecast");
+	fprintf(outputFile, "Record    Sensor Pressure     Filtered Pressure     Forecast\n");
 
 	/*	For loop that runs through all elements, check if element is valid.
 		If valid, print appropriate data into the output file	*/
-	int i = 0;
+	unsigned i = 0;
 	for (i = 0; i < infoCount; i++){
 		if (pressureInfo[i].isValid){
-			fprintf(inputFile, "%6d %18.3lf %16.3lfinHg %-5s\n", i, pressureInfo[i].sensorPressure, pressureInfo[i].filteredPressure, pressureInfo[i].forecast);
+			fprintf(outputFile, "%6d %14.3lfinHG %17.3lfinHg     %-s\n", i, pressureInfo[i].sensorPressure, pressureInfo[i].filteredPressure, pressureInfo[i].forecast);
 		}
 	}
 
-	fclose(inputFile);
-	inputFile = NULL;
+	fclose(outputFile);
+	outputFile = NULL;
 	return true;
 }
